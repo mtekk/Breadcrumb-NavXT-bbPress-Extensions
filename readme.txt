@@ -30,7 +30,7 @@ To customize the breadcrumb trail you may edit the default values for the option
 Please visit [Breadcrumb NavXT's Documentation](http://mtekk.us/code/breadcrumb-navxt/breadcrumb-navxt-doc/ "Go to Breadcrumb NavXT's Documentation.") page for more information.
 
 == Changelog ==
-= 1.0.0 =
+= 1.1.0 =
 Release date: April 8th, 2016
 
 * New feature: Added support for the current forum archive when within a topic
