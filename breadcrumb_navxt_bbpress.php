@@ -3,7 +3,7 @@
 Plugin Name: Breadcrumb NavXT bbPress Extensions
 Plugin URI: https://mtekk.us/extensions/breadcrumb-navxt-bbpress-extensions
 Description: Fixes a few edge cases that bbPress presents, specifically fixes the breadcrumb trail in topic tag archives. For details on how to use this plugin visit <a href="https://mtekk.us/extensions/breadcrumb-navxt-bbpress-extensions">Breadcrumb NavXT bbPress Extensions</a>. 
-Version: 1.1.0
+Version: 1.1.1
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -67,5 +67,5 @@ function bcn_bbp_filler($breadcrumb_trail)
 function bcn_bbp_do_forum_archive(&$breadcrumb_trail)
 {
 	$breadcrumb = new bcn_breadcrumb(bbp_get_forum_title($GLOBALS['post']->post_parent) , null, array('groups', 'groups-directory'), bbp_get_forum_permalink($GLOBALS['post']->post_parent));
-	array_splice($breadcrumb_trail->breadcrumbs, 2, 0, array($breadcrumb));
+	array_splice($breadcrumb_trail->breadcrumbs, count($breadcrumb_trail->breadcrumbs)-1, 0, array($breadcrumb));
 }
