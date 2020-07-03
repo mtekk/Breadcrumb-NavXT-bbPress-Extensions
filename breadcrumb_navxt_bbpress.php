@@ -3,7 +3,7 @@
 Plugin Name: Breadcrumb NavXT bbPress Extensions
 Plugin URI: https://mtekk.us/extensions/breadcrumb-navxt-bbpress-extensions
 Description: Fixes a few edge cases that bbPress presents, specifically fixes the breadcrumb trail in topic tag archives. For details on how to use this plugin visit <a href="https://mtekk.us/extensions/breadcrumb-navxt-bbpress-extensions">Breadcrumb NavXT bbPress Extensions</a>. 
-Version: 1.1.2
+Version: 1.1.3
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -29,7 +29,7 @@ DomainPath: /languages/
 require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
 add_filter('bcn_type_archive_post_type', 'bcn_bbp_type_topic_swap', 11);
 /**
- * Hooks into the bcn_type_archive_post_type filter and replaces 'topic' with 'forum' for the type
+ * Hooks into the bcn_type_archive_post_type filter and replaces 'topic' with 'forum' for the type for term archives
  * 
  * @param string $type The post type name to change/filter
  * 
@@ -57,20 +57,65 @@ function bcn_bbp_filler($breadcrumb_trail)
 	{
 		return;
 	}
+	if(bbp_is_search())
+	{
+		bcn_bbp_do_current_item($breadcrumb_trail);
+		bcn_bbp_type_archive($breadcrumb_trail);
+	}
+	if(bbp_is_search_results())
+	{
+		bcn_bbp_do_search($breadcrumb_trail);
+	}
 	//Handle user pages
-	if(bbp_is_single_topic())
+	if(bbp_is_single_user())
 	{
 		//Start by adding in the forum archive link (so that we have a known good position)
-		bcn_bbp_do_forum_archive($breadcrumb_trail);
+		bcn_bbp_do_user($breadcrumb_trail);
+		bcn_bbp_type_archive($breadcrumb_trail);
 	}
 }
-function bcn_bbp_do_forum_archive(&$breadcrumb_trail)
+function bcn_bbp_do_current_item(&$breadcrumb_trail)
 {
 	$breadcrumb = new bcn_breadcrumb(
 			bbp_get_forum_title($GLOBALS['post']->post_parent),
 			null,
-			array('groups', 'groups-directory'),
+			array('search'),
 			bbp_get_forum_permalink($GLOBALS['post']->post_parent),
+			null,
+			true);
+	array_splice($breadcrumb_trail->breadcrumbs, count($breadcrumb_trail->breadcrumbs)-1, 0, array($breadcrumb));
+}
+function bcn_bbp_do_search(&$breadcrumb_trail)
+{
+	$breadcrumb = new bcn_breadcrumb(
+			esc_html__('Search', 'bbpress'),
+			null,
+			array('search'),
+			bbp_get_search_url(),
+			null,
+			true);
+	array_splice($breadcrumb_trail->breadcrumbs, count($breadcrumb_trail->breadcrumbs)-2, 0, array($breadcrumb));
+}
+function bcn_bbp_do_user(&$breadcrumb_trail)
+{
+	$breadcrumb = new bcn_breadcrumb(
+			bbp_get_forum_title($GLOBALS['post']->post_parent),
+			null,
+			array('user'),
+			bbp_get_forum_permalink($GLOBALS['post']->post_parent),
+			null,
+			true);
+	array_splice($breadcrumb_trail->breadcrumbs, count($breadcrumb_trail->breadcrumbs)-2, 1, array($breadcrumb));
+}
+function bcn_bbp_type_archive($breadcrumb_trail)
+{
+	$type_str = 'forum';
+	//Place the breadcrumb in the trail, uses the constructor to set the title, prefix, and suffix, get a pointer to it in return
+	$breadcrumb = new bcn_breadcrumb(
+			get_post_type_object($type_str)->labels->name,
+			$breadcrumb_trail->opt['Hpost_' . $type_str . '_template'],
+			array('post', 'post-' . $type_str . '-archive'),
+			get_post_type_archive_link($type_str),
 			null,
 			true);
 	array_splice($breadcrumb_trail->breadcrumbs, count($breadcrumb_trail->breadcrumbs)-1, 0, array($breadcrumb));
